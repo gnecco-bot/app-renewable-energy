@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{% static "css/style.css" %}">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+    <nav>
+      <div class="container-nav">
+        <p><a href="{% url "app-home:buscar_endereco" %}">PI - UNIVESP</a></p>
+        <ul>
+          <li><a href="#contato" class="btn-contato">Contato</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main-container">
+      <h1 class="titulo-home">Projeções de energia renovável</h1>
+      <p class="mini-desc-titulo-home">Informe seu CEP e planeje o consumo com a previsão de geração de energia solar.</p>
+      
+      <div class="container">
+
+        <h4>Digite seu CEP</h4>
+        
+        <form action="{% url 'app-home:buscar_endereco' %}" method="POST">
+          {% csrf_token %}
+          <input type="text" name="cep" id="cep" maxlength="8" placeholder="Digite aqui o CEP" required>
+          <button type="submit">Enviar</button>
+        </form>
+
+        {% if erro %}
+            <p class="error-cep" style="color: red;"><strong>{{ erro }}</strong></p>
+        {% endif %}
+
+        {% if endereco %}
+          <div class="resultado">
+            <h3>Resultado</h3>          
+            <p><strong>Estado:</strong> {{ endereco.uf }}</p>
+            <p><strong>Cidade:</strong> {{ endereco.localidade }}</p>
+            <p><strong>Bairro:</strong> {{ endereco.bairro }}</p>
+            <p><strong>Logradouro:</strong> {{ endereco.logradouro }}</p>
+          </div>
+        {% endif %}
+
+        {% if clima %}
+          <hr>
+          <div class="resultado-clima">
+            <h3>Condições Atuais</h3>
+            <p><strong>Temperatura Atual:</strong> {{ clima.temp_atual }} °C</p>
+            <p><strong>Umidade Relativa:</strong> {{ clima.umidade }}%</p>
+            <p><strong>Velocidade do Vento:</strong> {{ clima.vento_velocidade }} km/h</p>
+            <p><strong>Irradiância Solar Direta:</strong> {{ clima.irradiancia_direta }} W/m²</p>
+
+            <h3 style="margin-top: 20px;">Previsão para os Próximos 7 Dias</h3>
+            
+            <div class="table-responsive">
+              <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: center;">
+                <thead>
+                  <tr style="background-color: #f2f2f2;">
+                    <th>Data</th>
+                    <th>Temp. Mínima</th>
+                    <th>Temp. Máxima</th>
+                    <th>Radiação Solar (MJ/m²)</th>
+                    <th>Vento Máx. (km/h)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for dia in clima.semana %}
+                    <tr>
+                      <td><strong>{{ dia.data }}</strong></td>
+                      <td style="color: blue;">{{ dia.temp_min }} °C</td>
+                      <td style="color: red;">{{ dia.temp_max }} °C</td>
+                      <td>{{ dia.radiacao_total }}</td>
+                      <td>{{ dia.vento_max }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+        
+        {% if conclusao_ia %}
+          <div class="card-ia" style="background-color: #f0f7ff; border-left: 5px solid #0275d8; padding: 20px; margin: 20px 0; border-radius: 6px; width: 100%; box-sizing: border-box;">
+            <h3 style="color: #0275d8; margin-top: 0;">Análise do Potencial Solar (IA)</h3>
+            <div style="white-space: pre-wrap; font-family: sans-serif; line-height: 1.5; color: #333;">{{ conclusao_ia|safe }}</div>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Rodapé (Footer) com ID Contato -->
+    <footer id="contato" style="background-color: #d1d1d1; border-top: 1px solid #aeaeae; text-align: center; padding: 25px 15px; margin-top: 50px; color: black;">
+      <h3 style="margin-top: 0; font-size: 20px;">Contato e Informações</h3>
+      <p style="margin: 8px 0;">Para dúvidas, suporte ou mais informações sobre o projeto:</p>
+      <p style="margin: 8px 0;"><strong>E-mail:</strong> <a href="mailto:lgneccocontact@gmail.com" style="color: black; text-decoration: underline;">lgneccocontact@gmail.com</a></p>
+      <p style="font-size: 14px; color: #555; margin-top: 15px;">PI - UNIVESP &copy; 2026 - Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
