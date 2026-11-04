@@ -47,7 +47,7 @@ def analisar_potencial_solar_ia(dados_clima, dados_endereco, cep):
         print("-> [Cache Hit] Resposta da IA recuperada do cache!")
         return resposta_cache
 
-    api_key = os.environ.get("GEMINI_API_KEY", "...")
+    api_key = os.environ.get("GEMINI_API_KEY", "PUT YOUR KEY GOOGLE AI")
     if not api_key:
         return "Chave de API do Gemini não configurada."
 
