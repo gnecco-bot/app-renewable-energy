@@ -37,6 +37,7 @@
           <button type="submit">Enviar</button>
         </form>
 
+        <!-- Condição paliativa opcional para o Erro (caso queira tratar via template, embora o bloco comum já oculte se vazio) -->
         {% if erro %}
             <p class="error-cep" style="color: red;"><strong>{{ erro }}</strong></p>
         {% endif %}
@@ -49,6 +50,13 @@
             <p><strong>Bairro:</strong> {{ endereco.bairro }}</p>
             <p><strong>Logradouro:</strong> {{ endereco.logradouro }}</p>
           </div>
+        {% else %}
+          <!-- Condição paliativa se a view não retornar o endereço (após uma submissão) -->
+          {% if request.method == "POST" and not erro %}
+            <div class="resultado" style="margin-top: 15px; color: #666;">
+              <p>Nenhum endereço encontrado para os dados informados.</p>
+            </div>
+          {% endif %}
         {% endif %}
 
         {% if clima %}
@@ -82,11 +90,21 @@
                       <td>{{ dia.radiacao_total }}</td>
                       <td>{{ dia.vento_max }}</td>
                     </tr>
+                  {% empty %}
+                    <!-- Condição paliativa caso a lista de dias venha vazia -->
+                    <tr>
+                      <td colspan="5" style="color: #666; padding: 10px;">Nenhum dado de previsão disponível para esta região.</td>
+                    </tr>
                   {% endfor %}
                 </tbody>
               </table>
             </div>
           </div>
+        {% else %}
+          <!-- Condição paliativa caso o bloco clima geral venha vazio após a busca -->
+          {% if request.method == "POST" and not erro and endereco %}
+            <p style="margin-top: 15px; color: #666;">Dados climáticos indisponíveis no momento para este local.</p>
+          {% endif %}
         {% endif %}
         
         {% if conclusao_ia %}
@@ -94,6 +112,13 @@
             <h3 style="color: #0275d8; margin-top: 0;">Análise do Potencial Solar (IA)</h3>
             <div style="white-space: pre-wrap; font-family: sans-serif; line-height: 1.5; color: #333;">{{ conclusao_ia|safe }}</div>
           </div>
+        {% else %}
+          <!-- Condição paliativa opcional se a IA falhar ao gerar o texto -->
+          {% if request.method == "POST" and not erro and clima %}
+            <div class="card-ia" style="background-color: #fff8f0; border-left: 5px solid #f0ad4e; padding: 15px; margin: 20px 0; border-radius: 6px; width: 100%; box-sizing: border-box;">
+              <p style="margin: 0; color: #8a6d3b;">A análise de inteligência artificial não pôde ser gerada no momento.</p>
+            </div>
+          {% endif %}
         {% endif %}
 
       </div>
